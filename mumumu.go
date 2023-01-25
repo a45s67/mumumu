@@ -19,6 +19,17 @@ type GifFrame struct {
 	delay        int
 }
 
+func renderMessage(imageWidth int, startTime time.Time) {
+	elapsed := time.Since(startTime)
+	msg := fmt.Sprintf("You have mumumued for %d seconds", int(elapsed.Seconds()))
+	msg_len := len(msg)
+
+	msg_left_pos := (imageWidth - msg_len) / 2
+	fmt.Printf("\033[2K")
+	fmt.Printf("\033[%dG", msg_left_pos)
+	fmt.Print(msg)
+}
+
 func flattenAscii(asciiSet [][]imgManip.AsciiChar, fontColor [3]int, colored, toSaveTxt bool) []string {
 
 	var ascii []string
@@ -122,6 +133,9 @@ func main() {
 		dither     = flags.Dither
 	)
 
+	var (
+		actual_gif_width  int
+	)
 	// Multi-threaded loop to decrease execution time
 	for i, frame := range bochhi_gif.Image {
 
@@ -158,6 +172,7 @@ func main() {
 				os.Exit(0)
 			}
 
+			actual_gif_width = len(asciiCharSet[0])
 			gifFramesSlice[i].asciiCharSet = asciiCharSet
 			gifFramesSlice[i].delay = bochhi_gif.Delay[i]
 
@@ -183,18 +198,21 @@ func main() {
 	wg.Wait()
 	fmt.Printf("                              \r")
 
+	startTime := time.Now()
+
+	// Hide cursor: https://stackoverflow.com/questions/30126490/how-to-hide-console-cursor-in-c
+	// Clear screen: https://stackoverflow.com/a/22892171/12764484
+	fmt.Printf("\033[?25l")
 	fmt.Print("\033[H\033[2J")
 	// Display the gif
 	for {
-		for i, asciiFrame := range asciiArtSet {
-			// Clear screen: https://stackoverflow.com/a/22892171/12764484
+		for i, asciiFrame := range asciiArtSet[0 : len(asciiArtSet)-1] {
+			// Move cursor to pos (1,1): https://en.wikipedia.org/wiki/ANSI_escape_code
+			fmt.Print("\033[1;1H")
 			os.Stdout.Write([]byte(asciiFrame))
 
-			// fmt.Println("OK......")
-			time.Sleep(1)
-			time.Sleep(time.Duration((time.Second * time.Duration(bochhi_gif.Delay[i])) / 100))
+			renderMessage(actual_gif_width, startTime)
+			time.Sleep(time.Duration((time.Second * time.Duration(gifFramesSlice[i].delay)) / 100))
 		}
 	}
-
-	//fmt.Printf("%v\n", asciiArt)
 }
