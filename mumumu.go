@@ -25,8 +25,8 @@ func renderMessage(imageWidth int, startTime time.Time) {
 	msg_len := len(msg)
 
 	msg_left_pos := (imageWidth - msg_len) / 2
-	fmt.Printf("\033[2K")
-	fmt.Printf("\033[%dG", msg_left_pos)
+	fmt.Printf("\033[2K")                // Clear line
+	fmt.Printf("\033[%dG", msg_left_pos) // Move cursor to pos
 	fmt.Print(msg)
 }
 
@@ -192,7 +192,6 @@ func main() {
 
 	wg.Wait()
 	fmt.Printf("                              \r")
-
 	startTime := time.Now()
 
 	// Hide cursor: https://stackoverflow.com/questions/30126490/how-to-hide-console-cursor-in-c
@@ -202,8 +201,7 @@ func main() {
 	// Display the gif
 	for {
 		for i, asciiFrame := range asciiArtSet[0 : len(asciiArtSet)-1] {
-			// Move cursor to pos (1,1): https://en.wikipedia.org/wiki/ANSI_escape_code
-			fmt.Print("\033[1;1H")
+			fmt.Print("\033[1;1H") // Move cursor to pos (1,1): https://en.wikipedia.org/wiki/ANSI_escape_code
 			os.Stdout.Write([]byte(asciiFrame))
 
 			renderMessage(actual_gif_width, startTime)
