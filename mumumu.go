@@ -80,7 +80,7 @@ func main() {
 
 	localFile, err := os.Open(file_path)
 	if err != nil {
-		fmt.Errorf("Open gif file error: %v", err)
+		fmt.Printf("Open gif file error: %v", err)
 		return
 	}
 	defer localFile.Close()
@@ -88,13 +88,8 @@ func main() {
 	bochhi_gif, err = gif.DecodeAll(localFile)
 
 	if err != nil {
-		if file_path == "-" {
-			fmt.Errorf("can't decode piped input: %v", err)
-			return
-		} else {
-			fmt.Errorf("can't decode %v: %v", file_path, err)
-			return
-		}
+		fmt.Printf("can't decode %v: %v", file_path, err)
+		return
 	}
 
 	var (
