@@ -60,7 +60,7 @@ func flattenAscii(asciiSet [][]imgManip.AsciiChar, fontColor [3]int, colored, to
 
 func main() {
 	// If file is in current directory. This can also be a URL to an image or gif.
-	file_path := "./gif/bocchi-the-rock-bocchi-the-rock-gif.gif"
+	filePath := "./gif/bocchi-the-rock-bocchi-the-rock-gif.gif"
 
 	flags := aic_package.DefaultFlags()
 
@@ -74,27 +74,27 @@ func main() {
 	// Conversion for an image
 
 	var (
-		localFile  *os.File
-		bochhi_gif *gif.GIF
+		fileStream  *os.File
+		bochhiGif *gif.GIF
 	)
 
-	localFile, err := os.Open(file_path)
+	fileStream, err := os.Open(filePath)
 	if err != nil {
 		fmt.Printf("Open gif file error: %v", err)
 		return
 	}
-	defer localFile.Close()
+	defer fileStream.Close()
 
-	bochhi_gif, err = gif.DecodeAll(localFile)
+	bochhiGif, err = gif.DecodeAll(fileStream)
 
 	if err != nil {
-		fmt.Printf("can't decode %v: %v", file_path, err)
+		fmt.Printf("can't decode %v: %v", filePath, err)
 		return
 	}
 
 	var (
-		asciiArtSet    = make([]string, len(bochhi_gif.Image))
-		gifFramesSlice = make([]GifFrame, len(bochhi_gif.Image))
+		asciiArtSet    = make([]string, len(bochhiGif.Image))
+		gifFramesSlice = make([]GifFrame, len(bochhiGif.Image))
 
 		counter             = 0
 		concurrentProcesses = 0
@@ -105,7 +105,7 @@ func main() {
 	fmt.Printf("Generating ascii art... 0%%\r")
 
 	// Get first frame of gif and its dimensions
-	firstGifFrame := bochhi_gif.Image[0].SubImage(bochhi_gif.Image[0].Rect)
+	firstGifFrame := bochhiGif.Image[0].SubImage(bochhiGif.Image[0].Rect)
 	firstGifFrameWidth := firstGifFrame.Bounds().Dx()
 	firstGifFrameHeight := firstGifFrame.Bounds().Dy()
 
@@ -129,10 +129,10 @@ func main() {
 	)
 
 	var (
-		actual_gif_width  int
+		actualGifWidth int
 	)
 	// Multi-threaded loop to decrease execution time
-	for i, frame := range bochhi_gif.Image {
+	for i, frame := range bochhiGif.Image {
 
 		wg.Add(1)
 		concurrentProcesses++
@@ -144,7 +144,7 @@ func main() {
 			// If a frame is found that is smaller than the first frame, then this gif contains smaller subimages that are
 			// positioned inside the original gif. This behavior isn't supported by this app
 			if firstGifFrameWidth != frameImage.Bounds().Dx() || firstGifFrameHeight != frameImage.Bounds().Dy() {
-				fmt.Printf("Error: " + file_path + " contains subimages smaller than default width and height\n\nProcess aborted because ascii-image-converter doesn't support subimage placement and transparency in GIFs\n\n")
+				fmt.Printf("Error: " + filePath + " contains subimages smaller than default width and height\n\nProcess aborted because ascii-image-converter doesn't support subimage placement and transparency in GIFs\n\n")
 				os.Exit(0)
 			}
 
@@ -167,16 +167,16 @@ func main() {
 				os.Exit(0)
 			}
 
-			actual_gif_width = len(asciiCharSet[0])
+			actualGifWidth = len(asciiCharSet[0])
 			gifFramesSlice[i].asciiCharSet = asciiCharSet
-			gifFramesSlice[i].delay = bochhi_gif.Delay[i]
+			gifFramesSlice[i].delay = bochhiGif.Delay[i]
 
 			ascii := flattenAscii(asciiCharSet, fontColor, colored || grayscale, false)
 
 			asciiArtSet[i] = strings.Join(ascii, "\n")
 
 			counter++
-			percentage := int((float64(counter) / float64(len(bochhi_gif.Image))) * 100)
+			percentage := int((float64(counter) / float64(len(bochhiGif.Image))) * 100)
 			fmt.Printf("Generating ascii art... " + strconv.Itoa(percentage) + "%%\r")
 
 			wg.Done()
@@ -204,7 +204,7 @@ func main() {
 			fmt.Print("\033[1;1H") // Move cursor to pos (1,1): https://en.wikipedia.org/wiki/ANSI_escape_code
 			os.Stdout.Write([]byte(asciiFrame))
 
-			renderMessage(actual_gif_width, startTime)
+			renderMessage(actualGifWidth, startTime)
 			time.Sleep(time.Duration((time.Second * time.Duration(gifFramesSlice[i].delay)) / 100))
 		}
 	}
