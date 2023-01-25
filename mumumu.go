@@ -61,18 +61,13 @@ func main() {
 	// specify atleast one of flags.Width, flags.Height or flags.Dimensions
 
 	// Conversion for an image
-	asciiArt, err := aic_package.Convert(file_path, flags)
-	if err != nil {
-		fmt.Println(err)
-		fmt.Println(asciiArt)
-	}
 
 	var (
 		localFile  *os.File
 		bochhi_gif *gif.GIF
 	)
 
-	localFile, err = os.Open(file_path)
+	localFile, err := os.Open(file_path)
 	if err != nil {
 		fmt.Errorf("Open gif file error: %v", err)
 		return
