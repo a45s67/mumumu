@@ -7,8 +7,12 @@ import (
 )
 
 func hideCursor() {
-	// Hide cursor: https://stackoverflow.com/questions/30126490/how-to-hide-console-cursor-in-c
+	// Hide&Show cursor: https://stackoverflow.com/questions/30126490/how-to-hide-console-cursor-in-c
 	fmt.Print("\033[?25l")
+}
+
+func showCursor(){
+    fmt.Print("\033[?25h")
 }
 
 func moveCursorToColumn(pos int) {
@@ -24,13 +28,18 @@ func clearLine() {
 	fmt.Printf("\033[2K") // Clear line
 }
 
-func renderGif(asciiArtSet []string, gifFramesSlice []GifFrame, startTime time.Time) {
+func renderGif(asciiArtSet []string, gifFramesSlice []GifFrame, startTime time.Time, e *EventCatcher) {
 	imageWidth := len(gifFramesSlice[0].asciiCharSet[0])
 	hideCursor()
 	clearScreen()
+    defer showCursor()
+    defer clearScreen()
 	// Display the gif
 	for {
 		for i, asciiFrame := range asciiArtSet[0 : len(asciiArtSet)-1] {
+			if e.stop.IsSet() {
+				return
+			}
 			renderImage(asciiFrame)
 			renderMessage(imageWidth, startTime)
 			time.Sleep(time.Duration((time.Second * time.Duration(gifFramesSlice[i].delay)) / 100))

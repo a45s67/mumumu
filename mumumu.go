@@ -30,5 +30,5 @@ func main() {
 	asciiArtSet := flattenAsciiImages(gifFramesSlice, flags.Colored || flags.Grayscale)
 
 	startTime := time.Now()
-	renderGif(asciiArtSet, gifFramesSlice, startTime)
+	renderGif(asciiArtSet, gifFramesSlice, startTime, &ec)
 }

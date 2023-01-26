@@ -40,7 +40,6 @@ func (e *EventCatcher) listenSignal() {
 		switch sig {
 		case syscall.SIGINT:
 			e.stop.Set()
-			os.Exit(1)
 		case syscall.SIGWINCH:
 			e.windowChange.Set()
 		}
