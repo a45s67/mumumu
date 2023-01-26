@@ -2,10 +2,10 @@ package main
 
 import (
 	"bufio"
+	"github.com/tevino/abool"
 	"os"
 	"os/signal"
 	"syscall"
-    "github.com/tevino/abool"
 )
 
 // https://opensourcedoc.com/golang-programming/class-object/
@@ -36,13 +36,14 @@ func (e *EventCatcher) listenSignal() {
 		syscall.SIGWINCH,
 	)
 	go func() {
-		sig := <-sigc
-		switch sig {
-		case syscall.SIGINT:
-			e.stop.Set()
-		case syscall.SIGWINCH:
-			e.windowChange.Set()
+		for sig := range sigc {
+			switch sig {
+			case syscall.SIGINT:
+				e.stop.Set()
+                break;
+			case syscall.SIGWINCH:
+				e.windowChange.Set()
+			}
 		}
 	}()
 }
-
