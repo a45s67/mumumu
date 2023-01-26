@@ -7,7 +7,10 @@ import (
 )
 
 func main() {
-	ec := EventCatcher{stop: new(abool.AtomicBool), windowChange: new(abool.AtomicBool)}
+	ec := EventCatcher{
+		stop:         new(abool.AtomicBool),
+		windowChange: new(abool.AtomicBool),
+	}
 	//ec.listenEnter()
 	ec.listenSignal()
 
@@ -25,10 +28,12 @@ func main() {
 
 	// Conversion for an image
 
-	bochhiGif := loadGif(filePath)
-	gifFramesSlice := gif2Ascii(bochhiGif, flags)
-	asciiArtSet := flattenAsciiImages(gifFramesSlice, flags.Colored || flags.Grayscale)
+	gr := GifRenderer{
+		filePath:    filePath,
+		renderFlags: flags,
+		startTime:   time.Now(),
+	}
 
-	startTime := time.Now()
-	renderGif(asciiArtSet, gifFramesSlice, startTime, &ec)
+    gr.loadGifToAscii()
+    gr.renderGif(&ec)
 }
