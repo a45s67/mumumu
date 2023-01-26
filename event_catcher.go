@@ -5,12 +5,13 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+    "github.com/tevino/abool"
 )
 
 // https://opensourcedoc.com/golang-programming/class-object/
 type EventCatcher struct {
-	windowChange bool
-	stop         bool
+	windowChange *abool.AtomicBool
+	stop         *abool.AtomicBool
 }
 
 func (e *EventCatcher) listenEnter() {
@@ -24,7 +25,7 @@ func (e *EventCatcher) listenEnter() {
 		}
 	}(ch)
 	<-ch
-	e.stop = true
+	e.stop.Set()
 }
 
 func (e *EventCatcher) listenSignal() {
@@ -38,10 +39,10 @@ func (e *EventCatcher) listenSignal() {
 		sig := <-sigc
 		switch sig {
 		case syscall.SIGINT:
-			e.stop = true
+			e.stop.Set()
 			os.Exit(1)
 		case syscall.SIGWINCH:
-			e.windowChange = true
+			e.windowChange.Set()
 		}
 	}()
 }

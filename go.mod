@@ -2,7 +2,10 @@ module mumumu
 
 go 1.19
 
-require github.com/TheZoraiz/ascii-image-converter v1.13.1
+require (
+	github.com/TheZoraiz/ascii-image-converter v1.13.1
+	github.com/tevino/abool v1.2.0
+)
 
 require (
 	github.com/disintegration/imaging v1.6.2 // indirect

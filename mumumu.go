@@ -2,11 +2,12 @@ package main
 
 import (
 	"github.com/TheZoraiz/ascii-image-converter/aic_package"
+	"github.com/tevino/abool"
 	"time"
 )
 
 func main() {
-	ec := EventCatcher{stop: false, windowChange: false}
+	ec := EventCatcher{stop: new(abool.AtomicBool), windowChange: new(abool.AtomicBool)}
 	//ec.listenEnter()
 	ec.listenSignal()
 
