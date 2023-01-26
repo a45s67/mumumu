@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bufio"
+	"github.com/eiannone/keyboard"
 	"github.com/tevino/abool"
 	"os"
 	"os/signal"
@@ -14,18 +14,20 @@ type EventCatcher struct {
 	stop         *abool.AtomicBool
 }
 
-func (e *EventCatcher) listenEnter() {
-	// https://stackoverflow.com/questions/54422309/how-to-catch-keypress-without-enter-in-golang-loop
-	ch := make(chan string)
-	go func(ch chan string) {
-		reader := bufio.NewReader(os.Stdin)
-		for {
-			s, _ := reader.ReadString('\n')
-			ch <- s
+func (e *EventCatcher) listenKeystroke() {
+	// https://github.com/eiannone/keyboard
+	// Exit after pressing any key.
+	go func() {
+		if err := keyboard.Open(); err != nil {
+			panic(err)
 		}
-	}(ch)
-	<-ch
-	e.stop.Set()
+		defer func() {
+			_ = keyboard.Close()
+		}()
+
+		keyboard.GetKey()
+		e.stop.Set()
+	}()
 }
 
 func (e *EventCatcher) listenSignal() {
@@ -40,7 +42,7 @@ func (e *EventCatcher) listenSignal() {
 			switch sig {
 			case syscall.SIGINT:
 				e.stop.Set()
-                break;
+				break
 			case syscall.SIGWINCH:
 				e.windowChange.Set()
 			}
