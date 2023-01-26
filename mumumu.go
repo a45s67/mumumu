@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/TheZoraiz/ascii-image-converter/aic_package"
 	imgManip "github.com/TheZoraiz/ascii-image-converter/image_manipulation"
@@ -12,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 )
 
@@ -27,11 +29,11 @@ func renderMessage(imageWidth int, startTime time.Time) {
 
 	msg_left_pos := (imageWidth - msg_len) / 2
 	fmt.Printf("\033[2K")                // Clear line
-	fmt.Printf("\033[%dG", msg_left_pos) // Move cursor to pos
+	fmt.Printf("\033[%dG", msg_left_pos) // Move cursor to column
 	fmt.Print(msg)
 }
 
-func flattenAscii(asciiSet [][]imgManip.AsciiChar, fontColor [3]int, colored, toSaveTxt bool) []string {
+func flattenAscii(asciiSet [][]imgManip.AsciiChar, colored bool) []string {
 
 	var ascii []string
 
@@ -39,15 +41,8 @@ func flattenAscii(asciiSet [][]imgManip.AsciiChar, fontColor [3]int, colored, to
 		var tempAscii string
 
 		for _, char := range line {
-			if toSaveTxt {
-				tempAscii += char.Simple
-				continue
-			}
-
 			if colored {
 				tempAscii += char.OriginalColor
-			} else if fontColor != [3]int{255, 255, 255} {
-				tempAscii += char.SetColor
 			} else {
 				tempAscii += char.Simple
 			}
@@ -97,46 +92,41 @@ func (e *EventCatcher) listenSignal() {
 		}
 	}()
 }
-func main() {
-	ec := EventCatcher{stop: false, windowChange: false}
-	ec.listenEnter()
-	ec.listenSignal()
 
-	// If file is in current directory. This can also be a URL to an image or gif.
-	filePath := "./gif/bocchi-the-rock-bocchi-the-rock-gif.gif"
-
-	flags := aic_package.DefaultFlags()
-
-	flags.Braille = true
-	flags.Colored = true
-	// flags.CustomMap = " .-=+#@"
-
-	// Note: For environments where a terminal isn't available (such as web servers), you MUST
-	// specify atleast one of flags.Width, flags.Height or flags.Dimensions
-
-	// Conversion for an image
-
+func loadGif(filePath string) *gif.GIF {
 	var (
-		fileStream  *os.File
-		bochhiGif *gif.GIF
+		fileStream *os.File
+		bochhiGif  *gif.GIF
 	)
 
 	fileStream, err := os.Open(filePath)
 	if err != nil {
 		fmt.Printf("Open gif file error: %v", err)
-		return
+		os.Exit(1)
 	}
 	defer fileStream.Close()
 
 	bochhiGif, err = gif.DecodeAll(fileStream)
-
 	if err != nil {
-		fmt.Printf("can't decode %v: %v", filePath, err)
-		return
+		fmt.Printf("Decode gif file stream error: %v", err)
+		os.Exit(1)
 	}
 
+	return bochhiGif
+}
+
+func flattenAsciiImages(gifFramesSlice []GifFrame, colored bool) []string {
+	var asciiArtSet []string
+	for _, gifFrame := range gifFramesSlice {
+		ascii := flattenAscii(gifFrame.asciiCharSet, colored)
+		asciiArtSet = append(asciiArtSet, strings.Join(ascii, "\n"))
+	}
+	return asciiArtSet
+}
+
+func gif2Ascii(bochhiGif *gif.GIF, flags aic_package.Flags) []GifFrame {
 	var (
-		asciiArtSet    = make([]string, len(bochhiGif.Image))
+		err            error
 		gifFramesSlice = make([]GifFrame, len(bochhiGif.Image))
 
 		counter             = 0
@@ -171,9 +161,6 @@ func main() {
 		dither     = flags.Dither
 	)
 
-	var (
-		actualGifWidth int
-	)
 	// Multi-threaded loop to decrease execution time
 	for i, frame := range bochhiGif.Image {
 
@@ -187,7 +174,7 @@ func main() {
 			// If a frame is found that is smaller than the first frame, then this gif contains smaller subimages that are
 			// positioned inside the original gif. This behavior isn't supported by this app
 			if firstGifFrameWidth != frameImage.Bounds().Dx() || firstGifFrameHeight != frameImage.Bounds().Dy() {
-				fmt.Printf("Error: " + filePath + " contains subimages smaller than default width and height\n\nProcess aborted because ascii-image-converter doesn't support subimage placement and transparency in GIFs\n\n")
+				fmt.Printf("Error: Gif contains subimages smaller than default width and height\n\nProcess aborted because ascii-image-converter doesn't support subimage placement and transparency in GIFs\n\n")
 				os.Exit(0)
 			}
 
@@ -210,13 +197,8 @@ func main() {
 				os.Exit(0)
 			}
 
-			actualGifWidth = len(asciiCharSet[0])
 			gifFramesSlice[i].asciiCharSet = asciiCharSet
 			gifFramesSlice[i].delay = bochhiGif.Delay[i]
-
-			ascii := flattenAscii(asciiCharSet, fontColor, colored || grayscale, false)
-
-			asciiArtSet[i] = strings.Join(ascii, "\n")
 
 			counter++
 			percentage := int((float64(counter) / float64(len(bochhiGif.Image))) * 100)
@@ -234,12 +216,40 @@ func main() {
 	}
 
 	wg.Wait()
-	fmt.Printf("                              \r")
+
+	return gifFramesSlice
+}
+
+func main() {
+	ec := EventCatcher{stop: false, windowChange: false}
+	//ec.listenEnter()
+	ec.listenSignal()
+
+	// If file is in current directory. This can also be a URL to an image or gif.
+	filePath := "./gif/bocchi-the-rock-bocchi-the-rock-gif.gif"
+
+	flags := aic_package.DefaultFlags()
+
+	flags.Braille = true
+	flags.Colored = true
+	// flags.CustomMap = " .-=+#@"
+
+	// Note: For environments where a terminal isn't available (such as web servers), you MUST
+	// specify atleast one of flags.Width, flags.Height or flags.Dimensions
+
+	// Conversion for an image
+
+	bochhiGif := loadGif(filePath)
+	gifFramesSlice := gif2Ascii(bochhiGif, flags)
+	asciiArtSet := flattenAsciiImages(gifFramesSlice, flags.Colored || flags.Grayscale)
+
+	imageWidth := len(gifFramesSlice[0].asciiCharSet[0])
+
 	startTime := time.Now()
 
 	// Hide cursor: https://stackoverflow.com/questions/30126490/how-to-hide-console-cursor-in-c
 	// Clear screen: https://stackoverflow.com/a/22892171/12764484
-	fmt.Printf("\033[?25l")
+	fmt.Print("\033[?25l")
 	fmt.Print("\033[H\033[2J")
 	// Display the gif
 	for {
@@ -247,7 +257,7 @@ func main() {
 			fmt.Print("\033[1;1H") // Move cursor to pos (1,1): https://en.wikipedia.org/wiki/ANSI_escape_code
 			os.Stdout.Write([]byte(asciiFrame))
 
-			renderMessage(actualGifWidth, startTime)
+			renderMessage(imageWidth, startTime)
 			time.Sleep(time.Duration((time.Second * time.Duration(gifFramesSlice[i].delay)) / 100))
 		}
 	}
