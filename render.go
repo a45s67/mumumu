@@ -61,6 +61,11 @@ func (gr *GifRenderer) renderGif(e *EventCatcher) {
 			if e.stop.IsSet() {
 				return
 			}
+			if e.windowChange.IsSet() {
+				gr.reload()
+				e.windowChange.UnSet()
+			}
+
 			renderImage(asciiFrame)
 			renderMessage(imageWidth, gr.startTime)
 			time.Sleep(time.Duration(
