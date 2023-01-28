@@ -63,7 +63,9 @@ func (gr *GifRenderer) renderGif(e *EventCatcher) {
 			}
 			if e.windowChange.IsSet() {
 				gr.reload()
+				imageWidth = len(gr.gifFramesSlice[0].asciiCharSet[0])
 				e.windowChange.UnSet()
+				break
 			}
 
 			renderImage(asciiFrame)
