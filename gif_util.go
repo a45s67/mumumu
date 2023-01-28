@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/TheZoraiz/ascii-image-converter/aic_package"
 	"github.com/TheZoraiz/ascii-image-converter/aic_package/winsize"
-	imgManip "github.com/TheZoraiz/ascii-image-converter/image_manipulation"
+	imgManip "github.com/a45s67/ascii-image-converter/image_manipulation"
 	"image"
 	"image/gif"
 	"io/ioutil"
