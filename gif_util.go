@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"image"
 	"image/gif"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"runtime"
 	"strconv"
@@ -16,6 +19,36 @@ import (
 type GifFrame struct {
 	asciiCharSet [][]imgManip.AsciiChar
 	delay        int
+}
+
+func isURL(str string) bool {
+	if len(str) < 8 {
+		return false
+	} else if str[:7] == "http://" || str[:8] == "https://" {
+		return true
+	}
+	return false
+}
+
+func loadGifFromURL(gifUrl string) *gif.GIF {
+	fmt.Printf("Fetching file from url...\r")
+
+	retrievedImage, err := http.Get(gifUrl)
+	if err != nil {
+		panic(fmt.Errorf("can't fetch content: %v", err))
+	}
+
+	urlImgBytes, err := ioutil.ReadAll(retrievedImage.Body)
+	if err != nil {
+		panic(fmt.Errorf("failed to read fetched content: %v", err))
+	}
+	defer retrievedImage.Body.Close()
+
+	decodedGif, err := gif.DecodeAll(bytes.NewReader(urlImgBytes))
+	if err != nil {
+		panic(fmt.Errorf("failed to decode gif: %v", err))
+	}
+	return decodedGif
 }
 
 func loadGif(filePath string) *gif.GIF {

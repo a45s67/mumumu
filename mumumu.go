@@ -11,7 +11,7 @@ func main() {
 		stop:         new(abool.AtomicBool),
 		windowChange: new(abool.AtomicBool),
 	}
-    ec.listenKeystroke()
+	ec.listenKeystroke()
 	ec.listenSignal()
 
 	// If file is in current directory. This can also be a URL to an image or gif.

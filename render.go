@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/TheZoraiz/ascii-image-converter/aic_package"
+	"image/gif"
 	"os"
 	"time"
+
+	"github.com/TheZoraiz/ascii-image-converter/aic_package"
 )
 
 func hideCursor() {
@@ -33,19 +35,27 @@ type GifRenderer struct {
 	filePath       string
 	renderFlags    aic_package.Flags
 	startTime      time.Time
+	decodedGifData *gif.GIF
 	gifFramesSlice []GifFrame
 	asciiArtSet    []string
 }
 
 func (gr *GifRenderer) loadGifToAscii() {
-	bochhiGif := loadGif(gr.filePath)
-	gr.gifFramesSlice = gif2Ascii(bochhiGif, gr.renderFlags)
+	if isURL(gr.filePath) {
+		gr.decodedGifData = loadGifFromURL(gr.filePath)
+	} else {
+		gr.decodedGifData = loadGif(gr.filePath)
+	}
+
+	gr.gifFramesSlice = gif2Ascii(gr.decodedGifData, gr.renderFlags)
 	gr.asciiArtSet = flattenAsciiImages(gr.gifFramesSlice,
 		gr.renderFlags.Colored || gr.renderFlags.Grayscale)
 }
 
 func (gr *GifRenderer) reload() {
-	gr.loadGifToAscii()
+	gr.gifFramesSlice = gif2Ascii(gr.decodedGifData, gr.renderFlags)
+	gr.asciiArtSet = flattenAsciiImages(gr.gifFramesSlice,
+		gr.renderFlags.Colored || gr.renderFlags.Grayscale)
 }
 
 func (gr *GifRenderer) renderGif(e *EventCatcher) {
