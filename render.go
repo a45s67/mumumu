@@ -66,7 +66,7 @@ func (gr *GifRenderer) renderGif(e *EventCatcher) {
 	defer clearScreen()
 	// Display the gif
 	for {
-		for i, asciiFrame := range gr.asciiArtSet[0 : len(gr.asciiArtSet)-1] {
+		for i, asciiFrame := range gr.asciiArtSet[0 : len(gr.asciiArtSet)] {
 			// TODO: Move action checking below into GifRenderer method
 			if e.stop.IsSet() {
 				return
@@ -98,6 +98,7 @@ func renderMessage(imageWidth int, startTime time.Time) {
 	msg_len := len(msg)
 	msg_left_pos := (imageWidth - msg_len) / 2
 
+	fmt.Print("\n")
 	clearLine()
 	moveCursorToColumn(msg_left_pos)
 	fmt.Print(msg)

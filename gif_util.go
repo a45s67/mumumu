@@ -3,6 +3,9 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"github.com/TheZoraiz/ascii-image-converter/aic_package"
+	"github.com/TheZoraiz/ascii-image-converter/aic_package/winsize"
+	imgManip "github.com/TheZoraiz/ascii-image-converter/image_manipulation"
 	"image"
 	"image/gif"
 	"io/ioutil"
@@ -12,8 +15,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"github.com/TheZoraiz/ascii-image-converter/aic_package"
-	imgManip "github.com/TheZoraiz/ascii-image-converter/image_manipulation"
 )
 
 type GifFrame struct {
@@ -96,9 +97,9 @@ func gif2Ascii(bochhiGif *gif.GIF, flags aic_package.Flags) []GifFrame {
 	fmt.Printf("Generating ascii art... 0%%\r")
 
 	// Get first frame of gif and its dimensions
-	firstGifFrame := bochhiGif.Image[0].SubImage(bochhiGif.Image[0].Rect)
-	firstGifFrameWidth := firstGifFrame.Bounds().Dx()
-	firstGifFrameHeight := firstGifFrame.Bounds().Dy()
+	// firstGifFrame := bochhiGif.Image[0].SubImage(bochhiGif.Image[0].Rect)
+	// firstGifFrameWidth := firstGifFrame.Bounds().Dx()
+	// firstGifFrameHeight := firstGifFrame.Bounds().Dy()
 
 	var (
 		dimensions = flags.Dimensions
@@ -131,10 +132,10 @@ func gif2Ascii(bochhiGif *gif.GIF, flags aic_package.Flags) []GifFrame {
 
 			// If a frame is found that is smaller than the first frame, then this gif contains smaller subimages that are
 			// positioned inside the original gif. This behavior isn't supported by this app
-			if firstGifFrameWidth != frameImage.Bounds().Dx() || firstGifFrameHeight != frameImage.Bounds().Dy() {
-				fmt.Printf("Error: Gif contains subimages smaller than default width and height\n\nProcess aborted because ascii-image-converter doesn't support subimage placement and transparency in GIFs\n\n")
-				os.Exit(0)
-			}
+			// if firstGifFrameWidth != frameImage.Bounds().Dx() || firstGifFrameHeight != frameImage.Bounds().Dy() {
+			//     fmt.Printf("Error: Gif contains subimages smaller than default width and height\n\nProcess aborted because ascii-image-converter doesn't support subimage placement and transparency in GIFs\n\n")
+			//     os.Exit(0)
+			// }
 
 			var imgSet [][]imgManip.AsciiPixel
 
@@ -145,7 +146,24 @@ func gif2Ascii(bochhiGif *gif.GIF, flags aic_package.Flags) []GifFrame {
 			}
 
 			var asciiCharSet [][]imgManip.AsciiChar
-			if flags.Braille {
+			halfBlockMode := true
+			if halfBlockMode {
+				imgWidth := float64(frameImage.Bounds().Dx())
+				imgHeight := float64(frameImage.Bounds().Dy())
+				aspectRatio := imgWidth / imgHeight
+
+				t_width, t_height, _ := winsize.GetTerminalSize()
+				t_height = t_height*2 - 1
+				if float64(t_width)/aspectRatio > float64(t_height) {
+					t_width = int(float64(t_height) * aspectRatio)
+				} else {
+					t_height = int(float64(t_width) / aspectRatio)
+				}
+
+				dimensions = []int{t_width, t_height}
+				imgSet, err = imgManip.ConvertToAsciiPixels(frameImage, dimensions, 0, 0, flipX, flipY, full, braille, dither)
+				asciiCharSet, err = imgManip.ConvertToHalfBlockChars(imgSet, negative, colored, grayscale)
+			} else if flags.Braille {
 				asciiCharSet, err = imgManip.ConvertToBrailleChars(imgSet, negative, colored, grayscale, colorBg, fontColor, threshold)
 			} else {
 				asciiCharSet, err = imgManip.ConvertToAsciiChars(imgSet, negative, colored, grayscale, complex, colorBg, customMap, fontColor)
