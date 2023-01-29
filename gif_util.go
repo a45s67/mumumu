@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/TheZoraiz/ascii-image-converter/aic_package"
 	"github.com/TheZoraiz/ascii-image-converter/aic_package/winsize"
 	imgManip "github.com/a45s67/ascii-image-converter/image_manipulation"
 	"image"
@@ -83,11 +82,13 @@ func flattenAsciiImages(gifFramesSlice []GifFrame, colored bool) []string {
 	return asciiArtSet
 }
 
-func gif2Ascii(bochhiGif *gif.GIF, flags aic_package.Flags) []GifFrame {
-	var (
-		err            error
-		gifFramesSlice = make([]GifFrame, len(bochhiGif.Image))
+func gif2Ascii(bochhiGif *gif.GIF, flagsEx FlagsEx) []GifFrame {
+	halfBlockMode := flagsEx.halfBlock
+	flags := flagsEx.flags
 
+	var (
+		err                 error
+		gifFramesSlice      = make([]GifFrame, len(bochhiGif.Image))
 		counter             = 0
 		concurrentProcesses = 0
 		wg                  sync.WaitGroup
@@ -95,11 +96,6 @@ func gif2Ascii(bochhiGif *gif.GIF, flags aic_package.Flags) []GifFrame {
 	)
 
 	fmt.Printf("Generating ascii art... 0%%\r")
-
-	// Get first frame of gif and its dimensions
-	// firstGifFrame := bochhiGif.Image[0].SubImage(bochhiGif.Image[0].Rect)
-	// firstGifFrameWidth := firstGifFrame.Bounds().Dx()
-	// firstGifFrameHeight := firstGifFrame.Bounds().Dy()
 
 	var (
 		dimensions = flags.Dimensions
@@ -130,13 +126,6 @@ func gif2Ascii(bochhiGif *gif.GIF, flags aic_package.Flags) []GifFrame {
 
 			frameImage := frame.SubImage(frame.Rect)
 
-			// If a frame is found that is smaller than the first frame, then this gif contains smaller subimages that are
-			// positioned inside the original gif. This behavior isn't supported by this app
-			// if firstGifFrameWidth != frameImage.Bounds().Dx() || firstGifFrameHeight != frameImage.Bounds().Dy() {
-			//     fmt.Printf("Error: Gif contains subimages smaller than default width and height\n\nProcess aborted because ascii-image-converter doesn't support subimage placement and transparency in GIFs\n\n")
-			//     os.Exit(0)
-			// }
-
 			var imgSet [][]imgManip.AsciiPixel
 
 			imgSet, err = imgManip.ConvertToAsciiPixels(frameImage, dimensions, width, height, flipX, flipY, full, braille, dither)
@@ -146,7 +135,6 @@ func gif2Ascii(bochhiGif *gif.GIF, flags aic_package.Flags) []GifFrame {
 			}
 
 			var asciiCharSet [][]imgManip.AsciiChar
-			halfBlockMode := true
 			if halfBlockMode {
 				imgWidth := float64(frameImage.Bounds().Dx())
 				imgHeight := float64(frameImage.Bounds().Dy())

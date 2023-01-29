@@ -5,8 +5,6 @@ import (
 	"image/gif"
 	"os"
 	"time"
-
-	"github.com/TheZoraiz/ascii-image-converter/aic_package"
 )
 
 func hideCursor() {
@@ -33,7 +31,7 @@ func clearLine() {
 
 type GifRenderer struct {
 	filePath       string
-	renderFlags    aic_package.Flags
+	renderFlagsEx  FlagsEx
 	startTime      time.Time
 	decodedGifData *gif.GIF
 	gifFramesSlice []GifFrame
@@ -47,15 +45,15 @@ func (gr *GifRenderer) loadGifToAscii() {
 		gr.decodedGifData = loadGif(gr.filePath)
 	}
 
-	gr.gifFramesSlice = gif2Ascii(gr.decodedGifData, gr.renderFlags)
+	gr.gifFramesSlice = gif2Ascii(gr.decodedGifData, gr.renderFlagsEx)
 	gr.asciiArtSet = flattenAsciiImages(gr.gifFramesSlice,
-		gr.renderFlags.Colored || gr.renderFlags.Grayscale)
+		gr.renderFlagsEx.flags.Colored || gr.renderFlagsEx.flags.Grayscale)
 }
 
 func (gr *GifRenderer) reload() {
-	gr.gifFramesSlice = gif2Ascii(gr.decodedGifData, gr.renderFlags)
+	gr.gifFramesSlice = gif2Ascii(gr.decodedGifData, gr.renderFlagsEx)
 	gr.asciiArtSet = flattenAsciiImages(gr.gifFramesSlice,
-		gr.renderFlags.Colored || gr.renderFlags.Grayscale)
+		gr.renderFlagsEx.flags.Colored || gr.renderFlagsEx.flags.Grayscale)
 }
 
 func (gr *GifRenderer) renderGif(e *EventCatcher) {
@@ -66,7 +64,7 @@ func (gr *GifRenderer) renderGif(e *EventCatcher) {
 	defer clearScreen()
 	// Display the gif
 	for {
-		for i, asciiFrame := range gr.asciiArtSet[0 : len(gr.asciiArtSet)] {
+		for i, asciiFrame := range gr.asciiArtSet[0:len(gr.asciiArtSet)] {
 			// TODO: Move action checking below into GifRenderer method
 			if e.stop.IsSet() {
 				return
