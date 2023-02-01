@@ -74,16 +74,19 @@ func loadGif(filePath string) *gif.GIF {
 	return bochhiGif
 }
 
-func getIdealRenderSize(image_size image.Rectangle, limit_size []int) []int {
+func getIdealRenderSize(image_size image.Rectangle, widthLimit int) []int {
 	imgWidth := float64(image_size.Dx())
 	imgHeight := float64(image_size.Dy())
 	aspectRatio := imgWidth / imgHeight
 
 	tWidth, tHeight, _ := winsize.GetTerminalSize()
 
-	idealWidth := math.Min(float64(tWidth), imgWidth)
-	idealHeight := math.Min(float64(tHeight), imgHeight)
-	tHeight = tHeight*2 - 1
+	if widthLimit == 0 {
+		widthLimit = tWidth
+	}
+	idealWidth := math.Min(float64(tWidth), float64(widthLimit))
+	idealHeight := 2*float64(tHeight) - 1
+
 	if float64(idealWidth)/aspectRatio > float64(idealHeight) {
 		idealWidth = idealHeight * aspectRatio
 	} else {
@@ -119,7 +122,6 @@ func gif2Ascii(bochhiGif *gif.GIF, flagsEx FlagsEx) []GifFrame {
 	var (
 		dimensions = flags.Dimensions
 		width      = flags.Width
-		height     = flags.Height
 		complex    = flags.Complex
 		negative   = flags.Negative
 		colored    = flags.Colored
@@ -145,11 +147,8 @@ func gif2Ascii(bochhiGif *gif.GIF, flagsEx FlagsEx) []GifFrame {
 			var imgSet [][]imgManip.AsciiPixel
 
 			frameImage := frame.SubImage(frame.Rect)
-			size_limit := []int{width, 0}
-			dimensions = getIdealRenderSize(frameImage.Bounds(), size_limit)
-			if halfBlockMode {
-				dimensions[1] *= 2
-			} else {
+			dimensions = getIdealRenderSize(frameImage.Bounds(), width)
+			if !halfBlockMode {
 				dimensions[1] /= 2
 			}
 
