@@ -8,6 +8,7 @@ import (
 	"image"
 	"image/gif"
 	"io/ioutil"
+	"math"
 	"net/http"
 	"os"
 	"runtime"
@@ -73,6 +74,24 @@ func loadGif(filePath string) *gif.GIF {
 	return bochhiGif
 }
 
+func getIdealRenderSize(image_size image.Rectangle, limit_size []int) []int {
+	imgWidth := float64(image_size.Dx())
+	imgHeight := float64(image_size.Dy())
+	aspectRatio := imgWidth / imgHeight
+
+	tWidth, tHeight, _ := winsize.GetTerminalSize()
+
+	idealWidth := math.Min(float64(tWidth), imgWidth)
+	idealHeight := math.Min(float64(tHeight), imgHeight)
+	tHeight = tHeight*2 - 1
+	if float64(idealWidth)/aspectRatio > float64(idealHeight) {
+		idealWidth = idealHeight * aspectRatio
+	} else {
+		idealHeight = idealWidth / aspectRatio
+	}
+	return []int{int(idealWidth), int(idealHeight)}
+}
+
 func flattenAsciiImages(gifFramesSlice []GifFrame, colored bool) []string {
 	var asciiArtSet []string
 	for _, gifFrame := range gifFramesSlice {
@@ -123,12 +142,18 @@ func gif2Ascii(bochhiGif *gif.GIF, flagsEx FlagsEx) []GifFrame {
 		concurrentProcesses++
 
 		go func(i int, frame *image.Paletted) {
-
-			frameImage := frame.SubImage(frame.Rect)
-
 			var imgSet [][]imgManip.AsciiPixel
 
-			imgSet, err = imgManip.ConvertToAsciiPixels(frameImage, dimensions, width, height, flipX, flipY, full, braille, dither)
+			frameImage := frame.SubImage(frame.Rect)
+			size_limit := []int{width, 0}
+			dimensions = getIdealRenderSize(frameImage.Bounds(), size_limit)
+			if halfBlockMode {
+				dimensions[1] *= 2
+			} else {
+				dimensions[1] /= 2
+			}
+
+			imgSet, err = imgManip.ConvertToAsciiPixels(frameImage, dimensions, 0, 0, flipX, flipY, full, braille, dither)
 			if err != nil {
 				fmt.Printf("Error: %v\n", err)
 				os.Exit(0)
@@ -136,20 +161,6 @@ func gif2Ascii(bochhiGif *gif.GIF, flagsEx FlagsEx) []GifFrame {
 
 			var asciiCharSet [][]imgManip.AsciiChar
 			if halfBlockMode {
-				imgWidth := float64(frameImage.Bounds().Dx())
-				imgHeight := float64(frameImage.Bounds().Dy())
-				aspectRatio := imgWidth / imgHeight
-
-				t_width, t_height, _ := winsize.GetTerminalSize()
-				t_height = t_height*2 - 1
-				if float64(t_width)/aspectRatio > float64(t_height) {
-					t_width = int(float64(t_height) * aspectRatio)
-				} else {
-					t_height = int(float64(t_width) / aspectRatio)
-				}
-
-				dimensions = []int{t_width, t_height}
-				imgSet, err = imgManip.ConvertToAsciiPixels(frameImage, dimensions, 0, 0, flipX, flipY, full, braille, dither)
 				asciiCharSet, err = imgManip.ConvertToHalfBlockChars(imgSet, negative, colored, grayscale)
 			} else if flags.Braille {
 				asciiCharSet, err = imgManip.ConvertToBrailleChars(imgSet, negative, colored, grayscale, colorBg, fontColor, threshold)
