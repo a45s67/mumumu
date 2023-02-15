@@ -15,9 +15,10 @@ type FlagsEx struct {
 }
 
 type Option struct {
-	Name  string
-	Path  string
-	Flags map[string]interface{}
+	Name    string
+	Path    string
+	Flags   map[string]interface{}
+	Message string
 }
 
 func loadConfig(configPath string) map[string]Option {
@@ -58,7 +59,7 @@ func readFlags(gifOption Option) FlagsEx {
 	if val, ok := gifOption.Flags["maxwidth"]; ok {
 		flags.Width = int(val.(float64))
 	}
-    flagsEx.flags = flags
+	flagsEx.flags = flags
 	return flagsEx
 }
 
@@ -82,6 +83,7 @@ func main() {
 		filePath:      gifSetting.Path,
 		renderFlagsEx: flagsEx,
 		startTime:     time.Now(),
+		message:       gifSetting.Message,
 	}
 
 	gr.loadGifToAscii()

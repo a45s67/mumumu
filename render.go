@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"image/gif"
 	"os"
+	"strings"
 	"time"
+
+	"github.com/TheZoraiz/ascii-image-converter/aic_package/winsize"
 )
 
 func hideCursor() {
@@ -30,12 +33,16 @@ func clearLine() {
 }
 
 type GifRenderer struct {
-	filePath       string
-	renderFlagsEx  FlagsEx
-	startTime      time.Time
+	filePath      string
+	renderFlagsEx FlagsEx
+	startTime     time.Time
+	message       string
+
 	decodedGifData *gif.GIF
 	gifFramesSlice []GifFrame
 	asciiArtSet    []string
+
+	terminalSize [2]int
 }
 
 func (gr *GifRenderer) loadGifToAscii() {
@@ -58,6 +65,8 @@ func (gr *GifRenderer) reload() {
 
 func (gr *GifRenderer) renderGif(e *EventCatcher) {
 	imageWidth := len(gr.gifFramesSlice[0].asciiCharSet[0])
+	imageHeight := len(gr.gifFramesSlice[0].asciiCharSet)
+	gr.terminalSize[0], gr.terminalSize[1], _ = winsize.GetTerminalSize()
 	hideCursor()
 	clearScreen()
 	defer showCursor()
@@ -69,32 +78,48 @@ func (gr *GifRenderer) renderGif(e *EventCatcher) {
 			if e.stopEvent.IsSet() {
 				return
 			}
-			if e.windowChange.IsSet() {
+			if e.windowChangeEvent.IsSet() {
 				gr.reload()
 				imageWidth = len(gr.gifFramesSlice[0].asciiCharSet[0])
-				e.windowChange.UnSet()
+				imageHeight = len(gr.gifFramesSlice[0].asciiCharSet)
+				gr.terminalSize[0], gr.terminalSize[1], _ = winsize.GetTerminalSize()
+				e.windowChangeEvent.UnSet()
 				break
 			}
 
-			renderImage(asciiFrame)
-			renderMessage(imageWidth, gr.startTime)
+			gr.renderImage(asciiFrame, imageWidth, imageHeight)
+			gr.renderMessage(imageWidth)
 			time.Sleep(time.Duration(
 				(time.Second * time.Duration(gr.gifFramesSlice[i].delay)) / 100))
 		}
 	}
 }
 
-func renderImage(asciiFrame string) {
-	fmt.Print("\033[1;1H") // Move cursor to pos (1,1): https://en.wikipedia.org/wiki/ANSI_escape_code
+func (gr *GifRenderer) renderImage(asciiFrame string, imageWidth int, imageHeight int) {
+	left := (gr.terminalSize[0]-imageWidth)/2 + 1
+	top := (gr.terminalSize[1]-imageHeight)/2 + 1
+
+	cursorTopLeftPos := fmt.Sprintf("\033[%d;%dH", top, left)
+	cursorLeftPos := fmt.Sprintf("\033[%dG", left)
+
+	fmt.Print(cursorTopLeftPos) // Move cursor to pos (1,1): https://en.wikipedia.org/wiki/ANSI_escape_code
+	asciiFrame = strings.Replace(asciiFrame, "\n", "\n"+cursorLeftPos, -1)
+
 	os.Stdout.Write([]byte(asciiFrame))
 }
 
-func renderMessage(imageWidth int, startTime time.Time) {
-	elapsed := time.Since(startTime)
-	msg := fmt.Sprintf("You have mumumued for %d seconds", int(elapsed.Seconds()))
+func (gr *GifRenderer) renderMessage(imageWidth int) {
+	if len(gr.message) == 0 {
+		return
+	}
+
+	elapsed := time.Since(gr.startTime)
+	msg := fmt.Sprintf(gr.message, int(elapsed.Seconds()))
+
+	left := (gr.terminalSize[0]-imageWidth)/2 + 1
 
 	msg_len := len(msg)
-	msg_left_pos := (imageWidth - msg_len) / 2
+	msg_left_pos := (imageWidth-msg_len)/2 + left
 
 	fmt.Print("\n")
 	clearLine()
