@@ -21,21 +21,21 @@ type Option struct {
 }
 
 func loadConfig(configPath string) map[string]Option {
-	var configArray []Option
 	configFile, err := os.Open(configPath)
 	defer configFile.Close()
 	if err != nil {
 		panic(err.Error())
 	}
 
+	var gifSettings []Option
 	jsonParser := json.NewDecoder(configFile)
-	jsonParser.Decode(&configArray)
+	jsonParser.Decode(&gifSettings)
 
-	configSet := map[string]Option{}
-	for _, config := range configArray {
-		configSet[config.Name] = config
+	gifSettingMap := map[string]Option{}
+	for _, config := range gifSettings {
+		gifSettingMap[config.Name] = config
 	}
-	return configSet
+	return gifSettingMap
 }
 
 func readFlags(gifOption Option) FlagsEx {
@@ -64,14 +64,14 @@ func readFlags(gifOption Option) FlagsEx {
 
 func main() {
 	ec := EventCatcher{
-		stop:         new(abool.AtomicBool),
-		windowChange: new(abool.AtomicBool),
+		stopEvent:         new(abool.AtomicBool),
+		windowChangeEvent: new(abool.AtomicBool),
 	}
 	ec.listenKeystroke()
 	ec.listenSignal()
 
-	targetGifOption := loadConfig("config.json")["mumumu"]
-	flagsEx := readFlags(targetGifOption)
+	gifSetting := loadConfig("config.json")["mumumu"]
+	flagsEx := readFlags(gifSetting)
 
 	// Note: For environments where a terminal isn't available (such as web servers), you MUST
 	// specify atleast one of flags.Width, flags.Height or flags.Dimensions
@@ -79,7 +79,7 @@ func main() {
 	// Conversion for an image
 
 	gr := GifRenderer{
-		filePath:      targetGifOption.Path,
+		filePath:      gifSetting.Path,
 		renderFlagsEx: flagsEx,
 		startTime:     time.Now(),
 	}

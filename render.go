@@ -66,7 +66,7 @@ func (gr *GifRenderer) renderGif(e *EventCatcher) {
 	for {
 		for i, asciiFrame := range gr.asciiArtSet[0:len(gr.asciiArtSet)] {
 			// TODO: Move action checking below into GifRenderer method
-			if e.stop.IsSet() {
+			if e.stopEvent.IsSet() {
 				return
 			}
 			if e.windowChange.IsSet() {

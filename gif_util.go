@@ -104,13 +104,13 @@ func flattenAsciiImages(gifFramesSlice []GifFrame, colored bool) []string {
 	return asciiArtSet
 }
 
-func gif2Ascii(bochhiGif *gif.GIF, flagsEx FlagsEx) []GifFrame {
+func gif2Ascii(gifData *gif.GIF, flagsEx FlagsEx) []GifFrame {
 	halfBlockMode := flagsEx.halfBlock
 	flags := flagsEx.flags
 
 	var (
 		err                 error
-		gifFramesSlice      = make([]GifFrame, len(bochhiGif.Image))
+		gifFramesSlice      = make([]GifFrame, len(gifData.Image))
 		counter             = 0
 		concurrentProcesses = 0
 		wg                  sync.WaitGroup
@@ -138,12 +138,12 @@ func gif2Ascii(bochhiGif *gif.GIF, flagsEx FlagsEx) []GifFrame {
 	)
 
 	// Multi-threaded loop to decrease execution time
-	for i, frame := range bochhiGif.Image {
+	for i, frame := range gifData.Image {
 
 		wg.Add(1)
 		concurrentProcesses++
 
-		go func(i int, frame *image.Paletted) {
+		func(i int, frame *image.Paletted) {
 			var imgSet [][]imgManip.AsciiPixel
 
 			frameImage := frame.SubImage(frame.Rect)
@@ -172,10 +172,10 @@ func gif2Ascii(bochhiGif *gif.GIF, flagsEx FlagsEx) []GifFrame {
 			}
 
 			gifFramesSlice[i].asciiCharSet = asciiCharSet
-			gifFramesSlice[i].delay = bochhiGif.Delay[i]
+			gifFramesSlice[i].delay = gifData.Delay[i]
 
 			counter++
-			percentage := int((float64(counter) / float64(len(bochhiGif.Image))) * 100)
+			percentage := int((float64(counter) / float64(len(gifData.Image))) * 100)
 			fmt.Printf("Generating ascii art... " + strconv.Itoa(percentage) + "%%\r")
 
 			wg.Done()
@@ -196,21 +196,21 @@ func gif2Ascii(bochhiGif *gif.GIF, flagsEx FlagsEx) []GifFrame {
 
 func flattenAscii(asciiSet [][]imgManip.AsciiChar, colored bool) []string {
 
-	var ascii []string
+	var AsciiImageString []string
 
 	for _, line := range asciiSet {
-		var tempAscii string
+		var coloredLine string
 
 		for _, char := range line {
 			if colored {
-				tempAscii += char.OriginalColor
+				coloredLine += char.OriginalColor
 			} else {
-				tempAscii += char.Simple
+				coloredLine += char.Simple
 			}
 		}
 
-		ascii = append(ascii, tempAscii)
+		AsciiImageString = append(AsciiImageString, coloredLine)
 	}
 
-	return ascii
+	return AsciiImageString
 }
