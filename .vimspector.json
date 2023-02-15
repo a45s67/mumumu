@@ -1,0 +1,18 @@
+{
+    "configurations": {
+        "run": {
+            "adapter": "delve",
+            "filetypes": [ "go" ], // optional
+            "variables": {
+                // example, to disable delve's go version check
+                //"dlvFlags": "--check-go-version=false"
+            },
+            "configuration": {
+                "dlvToolPath": "/home/fish/.gvm/pkgsets/go1.19/global/bin/dlv",
+                "request": "launch",
+                "program": "${fileDirname}",
+                "mode": "debug"
+            }
+        }
+    }
+}
