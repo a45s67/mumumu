@@ -10,8 +10,8 @@ import (
 
 // https://opensourcedoc.com/golang-programming/class-object/
 type EventCatcher struct {
-	windowChange *abool.AtomicBool
-	stop         *abool.AtomicBool
+	windowChangeEvent *abool.AtomicBool
+	stopEvent         *abool.AtomicBool
 }
 
 func (e *EventCatcher) listenKeystroke() {
@@ -26,7 +26,7 @@ func (e *EventCatcher) listenKeystroke() {
 		}()
 
 		keyboard.GetKey()
-		e.stop.Set()
+		e.stopEvent.Set()
 	}()
 }
 
@@ -41,10 +41,10 @@ func (e *EventCatcher) listenSignal() {
 		for sig := range sigc {
 			switch sig {
 			case syscall.SIGINT:
-				e.stop.Set()
+				e.stopEvent.Set()
 				break
 			case syscall.SIGWINCH:
-				e.windowChange.Set()
+				e.windowChangeEvent.Set()
 			}
 		}
 	}()
