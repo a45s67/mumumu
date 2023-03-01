@@ -4,12 +4,12 @@
         "path": "https://media.tenor.com/nIfKxqBUqQQAAAAC/shake-head-anime.gif",
         "flags": {
             "color": true,
-            "halfblock": true,
+            "halfblock": false,
             "braille": true,
-            "threshold": 30,
-            "maxwidth": 0
-        }
-
+            "threshold": 50,
+            "maxwidth": 100
+        },
+        "message": "You have mumumued for %d seconds..."
     },
     {
         "name": "1umumu",
