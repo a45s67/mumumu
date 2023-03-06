@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"os"
 	"time"
 
@@ -63,6 +64,12 @@ func readFlags(gifOption Option) FlagsEx {
 	return flagsEx
 }
 
+func initArgv(config *string, target *string) {
+	flag.StringVar(config, "c", "config.json", "Config file path.")
+	flag.StringVar(target, "g", "mumumu", "Render the gif set in config file.")
+    flag.Parse();
+}
+
 func main() {
 	ec := EventCatcher{
 		stopEvent:         new(abool.AtomicBool),
@@ -71,7 +78,13 @@ func main() {
 	ec.listenKeystroke()
 	ec.listenSignal()
 
-	gifSetting := loadConfig("config.json")["mumumu"]
+	var (
+		config string
+		target string
+	)
+	initArgv(&config, &target)
+
+	gifSetting := loadConfig(config)[target]
 	flagsEx := readFlags(gifSetting)
 
 	// Note: For environments where a terminal isn't available (such as web servers), you MUST
