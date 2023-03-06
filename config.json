@@ -12,18 +12,7 @@
         "message": "You have mumumued for %d seconds..."
     },
     {
-        "name": "1umumu",
-        "path": "https://media.tenor.com/nQbnkbBw3EUAAAAC/bocchi-bocchi-the.gif",
-        "flags": {
-            "color": true,
-            "halfblock": false,
-            "braille": true,
-            "threshold": 30,
-            "maxwidth": 100
-        }
-    },
-    {
-        "name": "2umumu",
+        "name": "nijika-cry",
         "path": "https://media.tenor.com/JFLRMx4dpScAAAAC/bocchi-the-rock-bocchi-the-rock-gif.gif",
         "flags": {
             "color": true,
@@ -34,29 +23,29 @@
         }
     },
     {
-        "name": "3umumu",
+        "name": "bocchi-the-chainsaw-no-color",
         "path": "https://media.tenor.com/nB9YSFNoDi8AAAAC/bocchi-the-rock-chainsaw-man.gif",
         "flags": {
-            "color": true,
+            "color": false,
             "halfblock": false,
             "braille": true,
-            "threshold": 30,
-            "maxwidth": 100
+            "threshold": 170,
+            "maxwidth": 200
         }
     },
     {
-        "name": "4umumu",
+        "name": "kita-ikuyo",
         "path": "https://media.tenor.com/Kif5V8DkNgYAAAAC/bocchi-the-rock-bocchi.gif",
         "flags": {
             "color": true,
             "halfblock": false,
-            "braille": true,
+            "braille": false,
             "threshold": 30,
             "maxwidth": 100
         }
     },
     {
-        "name": "5umumu",
+        "name": "kita-kirakira",
         "path": "https://media1.tenor.com/images/77a28a3d1343fcc2482fa835091418b3/tenor.gif?itemid=27477401",
         "flags": {
             "color": true,
@@ -64,54 +53,44 @@
             "braille": true,
             "threshold": 30,
             "maxwidth": 100
-        }
+        },
+        "message": "Kita has kirakira for %d seconds..."
     },
     {
-        "name": "6umumu",
+        "name": "kita-scared",
         "path": "https://media.tenor.com/rSryJTbRc4YAAAAC/bocchi-the-rock-kita-ikuyo.gif",
         "flags": {
             "color": true,
-            "halfblock": false,
-            "braille": true,
+            "halfblock": true,
+            "braille": false,
             "threshold": 30,
             "maxwidth": 100
         }
     },
     {
-        "name": "7umumu",
+        "name": "nijika-scared",
         "path": "https://media1.tenor.com/images/2ddebc5c19dda8a602591782ab19ffcb/tenor.gif?itemid=27477556",
         "flags": {
             "color": true,
-            "halfblock": false,
-            "braille": true,
+            "halfblock": true,
+            "braille": false,
             "threshold": 30,
             "maxwidth": 100
         }
     },
     {
-        "name": "8umumu",
+        "name": "bocchi-monster",
         "path": "https://media.tenor.com/526-Kgq17kMAAAAC/bocchi-the-rock-bocchi.gif",
         "flags": {
-            "color": true,
+            "color": false,
             "halfblock": false,
             "braille": true,
-            "threshold": 30,
+            "threshold": 200,
             "maxwidth": 100
         }
     },
     {
-        "name": "9umumu",
-        "path": "https://i0.hdslb.com/bfs/article/b8c7c7f6a34280e5f6cf2c75b422d949a52bd199.gif",
-        "flags": {
-            "color": true,
-            "halfblock": false,
-            "braille": true,
-            "threshold": 30,
-            "maxwidth": 100
-        }
-    },
-    {
-        "name": "1",
+        "name": "bocchi-the-chainsaw",
         "path": "https://media1.tenor.com/images/ef715b505f47d21418b497f4c1d7fbb0/tenor.gif?itemid=27478087",
         "flags": {
             "color": true,
@@ -122,7 +101,7 @@
         }
     },
     {
-        "name": "2",
+        "name": "nijika-shake",
         "path": "https://i0.hdslb.com/bfs/article/43ab8d5f2a35d29d5a7ef9246c7dc0c7b7495a57.gif",
         "flags": {
             "color": true,
@@ -133,8 +112,8 @@
         }
     },
     {
-        "name": "3",
-        "path": "https://tenor.com/zh-TW/view/bocchi-the-rock-chainsaw-man-hitori-goto-gif-27061336",
+        "name": "bochhi-the-chainsaw-fast",
+        "path": "https://media.tenor.com/nB9YSFNoDi8AAAAC/bocchi-the-rock-chainsaw-man.gif",
         "flags": {
             "color": true,
             "halfblock": false,
@@ -144,7 +123,7 @@
         }
     },
     {
-        "name": "4",
+        "name": "mumumu-v2",
         "path": "https://media.tenor.com/VyugKLEBolsAAAAC/bocchi-bocchi-the-rock.gif",
         "flags": {
             "color": true,
@@ -155,7 +134,7 @@
         }
     },
     {
-        "name": "5",
+        "name": "bochhi-dance",
         "path": "https://media.tenor.com/nQbnkbBw3EUAAAAC/bocchi-bocchi-the.gif",
         "flags": {
             "color": true,
@@ -167,7 +146,14 @@
     },
     {
         "name": "6",
-        "path": "./gif/bochhi.gif"
+        "path": "gif/bocchi-the-rock-bocchi-the-rock-gif.gif",
+        "flags": {
+            "color": true,
+            "halfblock": false,
+            "braille": true,
+            "threshold": 30,
+            "maxwidth": 100
+        }
     }
 ]
 
