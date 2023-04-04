@@ -1,6 +1,8 @@
 # Mumumu
 A terminal GIF renderer. Inspired by [nyancat-cli](https://github.com/klange/nyancat).
 
+[![asciicast](https://asciinema.org/a/x5uNhLnevjAfaHIxWvbvjJlDe.svg)](https://asciinema.org/a/x5uNhLnevjAfaHIxWvbvjJlDe)
+
 # Usage
 TODO
 ```
