@@ -1,8 +1,7 @@
 # Mumumu
 A terminal GIF renderer. Inspired by [nyancat-cli](https://github.com/klange/nyancat).
 
-<script async id="asciicast-x5uNhLnevjAfaHIxWvbvjJlDe" src="https://asciinema.org/a/x5uNhLnevjAfaHIxWvbvjJlDe.js"></script>
-
+<a href="https://asciinema.org/a/x5uNhLnevjAfaHIxWvbvjJlDe" target="_blank"><img src="https://asciinema.org/a/x5uNhLnevjAfaHIxWvbvjJlDe.svg" /></a>
 # Usage
 TODO
 ```
