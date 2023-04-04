@@ -1,7 +1,7 @@
 # Mumumu
 A terminal GIF renderer. Inspired by [nyancat-cli](https://github.com/klange/nyancat).
 
-https://drive.google.com/file/d/11rU0c8WeDMS5IQCASwfTit6fUW2pq5UZ/view?usp=share_link
+![](https://drive.google.com/file/d/11rU0c8WeDMS5IQCASwfTit6fUW2pq5UZ)
 
 
 # Usage
