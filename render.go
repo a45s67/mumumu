@@ -84,6 +84,7 @@ func (gr *GifRenderer) renderGif(e *EventCatcher) {
 	defer clearScreen()
 	// Display the gif
 	for {
+		clearScreen()
 		for i, asciiFrame := range gr.asciiArtSet[0:len(gr.asciiArtSet)] {
 			// TODO: Move action checking below into GifRenderer method
 			if e.stopEvent.IsSet() {
