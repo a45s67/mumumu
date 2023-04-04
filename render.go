@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/TheZoraiz/ascii-image-converter/aic_package/winsize"
+	imgManip "github.com/a45s67/ascii-image-converter/image_manipulation"
 )
 
 func hideCursor() {
@@ -30,6 +31,16 @@ func clearScreen() {
 
 func clearLine() {
 	fmt.Printf("\033[2K") // Clear line
+}
+
+func getAsciiImageWidth(asciiCharSet [][]imgManip.AsciiChar) int {
+	var asciis_of_top_line []string
+	for _, asciichar := range asciiCharSet[0] {
+		asciis_of_top_line = append(asciis_of_top_line, asciichar.Simple)
+	}
+	// Convert to rune to count the utf8 string length.
+	// https://stackoverflow.com/questions/12668681/how-to-get-the-number-of-characters-in-a-string
+	return len([]rune(strings.Join(asciis_of_top_line, "")))
 }
 
 type GifRenderer struct {
@@ -64,7 +75,7 @@ func (gr *GifRenderer) reload() {
 }
 
 func (gr *GifRenderer) renderGif(e *EventCatcher) {
-	imageWidth := len(gr.gifFramesSlice[0].asciiCharSet[0])
+	imageWidth := getAsciiImageWidth(gr.gifFramesSlice[0].asciiCharSet)
 	imageHeight := len(gr.gifFramesSlice[0].asciiCharSet)
 	gr.terminalSize[0], gr.terminalSize[1], _ = winsize.GetTerminalSize()
 	hideCursor()
@@ -80,7 +91,7 @@ func (gr *GifRenderer) renderGif(e *EventCatcher) {
 			}
 			if e.windowChangeEvent.IsSet() {
 				gr.reload()
-				imageWidth = len(gr.gifFramesSlice[0].asciiCharSet[0])
+				imageWidth = getAsciiImageWidth(gr.gifFramesSlice[0].asciiCharSet)
 				imageHeight = len(gr.gifFramesSlice[0].asciiCharSet)
 				gr.terminalSize[0], gr.terminalSize[1], _ = winsize.GetTerminalSize()
 				e.windowChangeEvent.UnSet()
