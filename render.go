@@ -91,6 +91,7 @@ func (gr *GifRenderer) renderGif(e *EventCatcher) {
 			}
 			if e.windowChangeEvent.IsSet() {
 				gr.reload()
+				clearScreen()
 				imageWidth = getAsciiImageWidth(gr.gifFramesSlice[0].asciiCharSet)
 				imageHeight = len(gr.gifFramesSlice[0].asciiCharSet)
 				gr.terminalSize[0], gr.terminalSize[1], _ = winsize.GetTerminalSize()
