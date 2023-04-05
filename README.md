@@ -71,6 +71,11 @@ Reference
     - gif infos array
         - repeat or not
 
+# Support Fonts
+Fonts below are tested and work well.
+- Nerd font patch for JetBrainsMono
+- CaskaydiaCove NF
+
 # Troubleshooting
 If you find the color rendered on terminal is not correct, check whether the true color mode is enabled.
 ```
