@@ -3,18 +3,20 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/TheZoraiz/ascii-image-converter/aic_package/winsize"
-	imgManip "github.com/a45s67/ascii-image-converter/image_manipulation"
 	"image"
 	"image/gif"
 	"io/ioutil"
 	"math"
 	"net/http"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/TheZoraiz/ascii-image-converter/aic_package/winsize"
+	imgManip "github.com/a45s67/ascii-image-converter/image_manipulation"
 )
 
 type GifFrame struct {
@@ -31,9 +33,10 @@ func isURL(str string) bool {
 	return false
 }
 
-func loadGifFromURL(gifUrl string) *gif.GIF {
+func requestGIF(gifUrl string) []byte {
 	fmt.Printf("Fetching file from url...\r")
 
+	// Request the gif data
 	retrievedImage, err := http.Get(gifUrl)
 	if err != nil {
 		panic(fmt.Errorf("can't fetch content: %v", err))
@@ -44,18 +47,38 @@ func loadGifFromURL(gifUrl string) *gif.GIF {
 		panic(fmt.Errorf("failed to read fetched content: %v", err))
 	}
 	defer retrievedImage.Body.Close()
+	return urlImgBytes
+
+}
+
+func loadGIFFromURL(gifUrl string) *gif.GIF {
+	urlImgBytes := requestGIF(gifUrl)
 
 	decodedGif, err := gif.DecodeAll(bytes.NewReader(urlImgBytes))
 	if err != nil {
-		panic(fmt.Errorf("failed to decode gif: %v", err))
+		fmt.Printf("Decode gif file stream error: %v", err)
+		os.Exit(1)
 	}
 	return decodedGif
+}
+
+func downloadGIF(gifUrl string, cache string) {
+	urlImgBytes := requestGIF(gifUrl)
+
+	// Write the gif raw data to cache file
+	if err := os.MkdirAll(filepath.Dir(cache), 0770); err != nil {
+		panic(err)
+	}
+	err := os.WriteFile(cache, urlImgBytes, 0644)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func loadGif(filePath string) *gif.GIF {
 	var (
 		fileStream *os.File
-		bochhiGif  *gif.GIF
+		decodedGif *gif.GIF
 	)
 
 	fileStream, err := os.Open(filePath)
@@ -65,13 +88,13 @@ func loadGif(filePath string) *gif.GIF {
 	}
 	defer fileStream.Close()
 
-	bochhiGif, err = gif.DecodeAll(fileStream)
+	decodedGif, err = gif.DecodeAll(fileStream)
 	if err != nil {
 		fmt.Printf("Decode gif file stream error: %v", err)
 		os.Exit(1)
 	}
 
-	return bochhiGif
+	return decodedGif
 }
 
 func getIdealRenderSize(image_size image.Rectangle, widthLimit int) []int {

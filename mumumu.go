@@ -2,10 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
+	"fmt"
 	"os"
 	"time"
-	"fmt"
 
 	"github.com/TheZoraiz/ascii-image-converter/aic_package"
 	"github.com/tevino/abool"
@@ -19,22 +20,33 @@ type FlagsEx struct {
 }
 
 type Option struct {
-	Name    string
-	Path    string
-	Flags   map[string]interface{}
-	Message string
+	Name    string                 `json:"name"`
+	URL     string                 `json:"url"`
+	Cache   string                 `json:"cache"`
+	Flags   map[string]interface{} `json:"flags"`
+	Message string                 `json:"message"`
+}
+
+func fileExist(filepath string) bool {
+	if _, err := os.Stat(filepath); errors.Is(err, os.ErrNotExist) {
+		return false
+	}
+	return true
 }
 
 func loadConfig(configPath string) map[string]Option {
-	configFile, err := os.Open(configPath)
-	defer configFile.Close()
+	fo, err := os.Open(configPath)
+	defer fo.Close()
 	if err != nil {
 		panic(err.Error())
 	}
 
 	var gifSettings []Option
-	jsonParser := json.NewDecoder(configFile)
-	jsonParser.Decode(&gifSettings)
+	jsonParser := json.NewDecoder(fo)
+	err = jsonParser.Decode(&gifSettings)
+	if err != nil {
+		panic(err.Error())
+	}
 
 	gifSettingMap := map[string]Option{}
 	for _, config := range gifSettings {
@@ -76,9 +88,10 @@ func readFlags(gifOption Option) FlagsEx {
 	return flags
 }
 
-func initArgv(config *string, target *string) {
+func initArgv(config *string, target *string, nocache *bool) {
 	flag.StringVar(config, "c", "config.json", "Config file path.")
 	flag.StringVar(target, "g", "mumumu", "Load the gif setting in config file.")
+	flag.BoolVar(nocache, "n", false, "Ignore the gif cache stored in local and download it again.")
 	flag.Parse()
 }
 
@@ -91,13 +104,14 @@ func main() {
 	ec.listenSignal()
 
 	var (
-		config string
-		target string
+		config  string
+		target  string
+		nocache bool
 	)
-	initArgv(&config, &target)
+	initArgv(&config, &target, &nocache)
 
-	gifSetting := loadConfig(config)[target]
-	flagsEx := readFlags(gifSetting)
+	gifOption := loadConfig(config)[target]
+	flagsEx := readFlags(gifOption)
 
 	// Note: For environments where a terminal isn't available (such as web servers), you MUST
 	// specify atleast one of flags.Width, flags.Height or flags.Dimensions
@@ -105,10 +119,21 @@ func main() {
 	// Conversion for an image
 
 	gr := GifRenderer{
-		filePath:      gifSetting.Path,
-		flags: flagsEx,
-		startTime:     time.Now(),
-		message:       gifSetting.Message,
+		flags:     flagsEx,
+		startTime: time.Now(),
+		message:   gifOption.Message,
+	}
+
+	if gifOption.Cache == "" {
+		gr.decodedGifData = loadGIFFromURL(gifOption.URL)
+	} else if nocache || !fileExist(gifOption.Cache) {
+		downloadGIF(gifOption.URL, gifOption.Cache)
+		gr.decodedGifData = loadGif(gifOption.Cache)
+	} else if fileExist(gifOption.Cache) {
+		gr.decodedGifData = loadGif(gifOption.Cache)
+	} else {
+		panic(fmt.Errorf("Invalid setting for url '%s', cache '%s' in option '%s'",
+			gifOption.URL, gifOption.Cache, gifOption.Name))
 	}
 
 	gr.loadGifToAscii()

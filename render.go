@@ -44,7 +44,7 @@ func getAsciiImageWidth(asciiCharSet [][]imgManip.AsciiChar) int {
 }
 
 type GifRenderer struct {
-	filePath  string
+	cache     string
 	flags     FlagsEx
 	startTime time.Time
 	message   string
@@ -57,12 +57,6 @@ type GifRenderer struct {
 }
 
 func (gr *GifRenderer) loadGifToAscii() {
-	if isURL(gr.filePath) {
-		gr.decodedGifData = loadGifFromURL(gr.filePath)
-	} else {
-		gr.decodedGifData = loadGif(gr.filePath)
-	}
-
 	gr.gifFramesSlice = gif2Ascii(gr.decodedGifData, gr.flags)
 	gr.asciiArtSet = flattenAsciiImages(gr.gifFramesSlice,
 		gr.flags.Colored || gr.flags.Grayscale)
