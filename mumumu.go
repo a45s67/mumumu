@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/TheZoraiz/ascii-image-converter/aic_package"
+	"github.com/mitchellh/go-homedir"
 	"github.com/tevino/abool"
 )
 
@@ -50,6 +51,11 @@ func loadConfig(configPath string) map[string]Option {
 
 	gifSettingMap := map[string]Option{}
 	for _, config := range gifSettings {
+		// https://stackoverflow.com/a/46286351
+		config.Cache, err = homedir.Expand(config.Cache)
+		if err != nil {
+			panic(err.Error())
+		}
 		gifSettingMap[config.Name] = config
 	}
 	return gifSettingMap

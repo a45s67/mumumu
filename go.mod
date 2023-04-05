@@ -6,6 +6,7 @@ require (
 	github.com/TheZoraiz/ascii-image-converter v1.13.1
 	github.com/a45s67/ascii-image-converter v0.0.0-20230128190455-032e65fd6742
 	github.com/eiannone/keyboard v0.0.0-20220611211555-0d226195f203
+	github.com/mitchellh/go-homedir v1.1.0
 	github.com/tevino/abool v1.2.0
 )
 
