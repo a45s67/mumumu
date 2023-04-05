@@ -5,14 +5,17 @@ import (
 	"flag"
 	"os"
 	"time"
+	"fmt"
 
 	"github.com/TheZoraiz/ascii-image-converter/aic_package"
 	"github.com/tevino/abool"
 )
 
 type FlagsEx struct {
+	aic_package.Flags
+
 	halfBlock bool
-	flags     aic_package.Flags
+	mode      string
 }
 
 type Option struct {
@@ -41,18 +44,28 @@ func loadConfig(configPath string) map[string]Option {
 }
 
 func readFlags(gifOption Option) FlagsEx {
-	flagsEx := FlagsEx{
-		halfBlock: false,
+	flags := FlagsEx{
+		aic_package.DefaultFlags(),
+		false,
+		"ascii",
 	}
-	flags := aic_package.DefaultFlags()
 	if val, ok := gifOption.Flags["color"]; ok {
 		flags.Colored = val.(bool)
 	}
-	if val, ok := gifOption.Flags["halfblock"]; ok {
-		flagsEx.halfBlock = val.(bool)
-	}
-	if val, ok := gifOption.Flags["braille"]; ok {
-		flags.Braille = val.(bool)
+	if val, ok := gifOption.Flags["mode"]; ok {
+		flags.halfBlock = false
+		flags.Braille = false
+
+		mode := val.(string)
+		switch mode {
+		case "braille":
+			flags.Braille = true
+		case "halfblock":
+			flags.halfBlock = true
+		case "ascii":
+		default:
+			panic(fmt.Errorf("Error: Unknown mode %s", mode))
+		}
 	}
 	if val, ok := gifOption.Flags["threshold"]; ok {
 		flags.Threshold = int(val.(float64))
@@ -60,8 +73,7 @@ func readFlags(gifOption Option) FlagsEx {
 	if val, ok := gifOption.Flags["maxwidth"]; ok {
 		flags.Width = int(val.(float64))
 	}
-	flagsEx.flags = flags
-	return flagsEx
+	return flags
 }
 
 func initArgv(config *string, target *string) {
@@ -94,7 +106,7 @@ func main() {
 
 	gr := GifRenderer{
 		filePath:      gifSetting.Path,
-		renderFlagsEx: flagsEx,
+		flags: flagsEx,
 		startTime:     time.Now(),
 		message:       gifSetting.Message,
 	}

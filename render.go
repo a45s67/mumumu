@@ -44,10 +44,10 @@ func getAsciiImageWidth(asciiCharSet [][]imgManip.AsciiChar) int {
 }
 
 type GifRenderer struct {
-	filePath      string
-	renderFlagsEx FlagsEx
-	startTime     time.Time
-	message       string
+	filePath  string
+	flags     FlagsEx
+	startTime time.Time
+	message   string
 
 	decodedGifData *gif.GIF
 	gifFramesSlice []GifFrame
@@ -63,15 +63,15 @@ func (gr *GifRenderer) loadGifToAscii() {
 		gr.decodedGifData = loadGif(gr.filePath)
 	}
 
-	gr.gifFramesSlice = gif2Ascii(gr.decodedGifData, gr.renderFlagsEx)
+	gr.gifFramesSlice = gif2Ascii(gr.decodedGifData, gr.flags)
 	gr.asciiArtSet = flattenAsciiImages(gr.gifFramesSlice,
-		gr.renderFlagsEx.flags.Colored || gr.renderFlagsEx.flags.Grayscale)
+		gr.flags.Colored || gr.flags.Grayscale)
 }
 
 func (gr *GifRenderer) reload() {
-	gr.gifFramesSlice = gif2Ascii(gr.decodedGifData, gr.renderFlagsEx)
+	gr.gifFramesSlice = gif2Ascii(gr.decodedGifData, gr.flags)
 	gr.asciiArtSet = flattenAsciiImages(gr.gifFramesSlice,
-		gr.renderFlagsEx.flags.Colored || gr.renderFlagsEx.flags.Grayscale)
+		gr.flags.Colored || gr.flags.Grayscale)
 }
 
 func (gr *GifRenderer) renderGif(e *EventCatcher) {

@@ -4,8 +4,7 @@
         "path": "https://media.tenor.com/nIfKxqBUqQQAAAAC/shake-head-anime.gif",
         "flags": {
             "color": true,
-            "halfblock": false,
-            "braille": true,
+            "mode": "braille",
             "threshold": 50,
             "maxwidth": 100
         },
@@ -16,8 +15,7 @@
         "path": "https://media.tenor.com/JFLRMx4dpScAAAAC/bocchi-the-rock-bocchi-the-rock-gif.gif",
         "flags": {
             "color": true,
-            "halfblock": false,
-            "braille": true,
+            "mode": "braille",
             "threshold": 30,
             "maxwidth": 100
         }
@@ -27,8 +25,7 @@
         "path": "https://media.tenor.com/nB9YSFNoDi8AAAAC/bocchi-the-rock-chainsaw-man.gif",
         "flags": {
             "color": false,
-            "halfblock": false,
-            "braille": true,
+            "mode": "braille",
             "threshold": 170,
             "maxwidth": 200
         }
@@ -38,8 +35,7 @@
         "path": "https://media.tenor.com/Kif5V8DkNgYAAAAC/bocchi-the-rock-bocchi.gif",
         "flags": {
             "color": true,
-            "halfblock": false,
-            "braille": false,
+            "mode": "ascii",
             "threshold": 30,
             "maxwidth": 100
         }
@@ -49,8 +45,7 @@
         "path": "https://media1.tenor.com/images/77a28a3d1343fcc2482fa835091418b3/tenor.gif?itemid=27477401",
         "flags": {
             "color": true,
-            "halfblock": false,
-            "braille": true,
+            "mode": "braille",
             "threshold": 30,
             "maxwidth": 100
         },
@@ -61,8 +56,7 @@
         "path": "https://media.tenor.com/rSryJTbRc4YAAAAC/bocchi-the-rock-kita-ikuyo.gif",
         "flags": {
             "color": true,
-            "halfblock": true,
-            "braille": false,
+            "mode": "halfblock",
             "threshold": 30,
             "maxwidth": 100
         }
@@ -72,8 +66,7 @@
         "path": "https://media1.tenor.com/images/2ddebc5c19dda8a602591782ab19ffcb/tenor.gif?itemid=27477556",
         "flags": {
             "color": true,
-            "halfblock": true,
-            "braille": false,
+            "mode": "halfblock",
             "threshold": 30,
             "maxwidth": 100
         }
@@ -83,8 +76,7 @@
         "path": "https://media.tenor.com/526-Kgq17kMAAAAC/bocchi-the-rock-bocchi.gif",
         "flags": {
             "color": false,
-            "halfblock": false,
-            "braille": true,
+            "mode": "braille",
             "threshold": 200,
             "maxwidth": 100
         }
@@ -94,8 +86,7 @@
         "path": "https://media1.tenor.com/images/ef715b505f47d21418b497f4c1d7fbb0/tenor.gif?itemid=27478087",
         "flags": {
             "color": true,
-            "halfblock": false,
-            "braille": true,
+            "mode": "braille",
             "threshold": 30,
             "maxwidth": 100
         }
@@ -105,8 +96,7 @@
         "path": "https://i0.hdslb.com/bfs/article/43ab8d5f2a35d29d5a7ef9246c7dc0c7b7495a57.gif",
         "flags": {
             "color": true,
-            "halfblock": false,
-            "braille": true,
+            "mode": "braille",
             "threshold": 30,
             "maxwidth": 100
         }
@@ -116,8 +106,7 @@
         "path": "https://media.tenor.com/nB9YSFNoDi8AAAAC/bocchi-the-rock-chainsaw-man.gif",
         "flags": {
             "color": true,
-            "halfblock": false,
-            "braille": true,
+            "mode": "braille",
             "threshold": 30,
             "maxwidth": 100
         }
@@ -127,8 +116,7 @@
         "path": "https://media.tenor.com/VyugKLEBolsAAAAC/bocchi-bocchi-the-rock.gif",
         "flags": {
             "color": true,
-            "halfblock": false,
-            "braille": true,
+            "mode": "braille",
             "threshold": 30,
             "maxwidth": 100
         }
@@ -138,19 +126,7 @@
         "path": "https://media.tenor.com/nQbnkbBw3EUAAAAC/bocchi-bocchi-the.gif",
         "flags": {
             "color": true,
-            "halfblock": false,
-            "braille": true,
-            "threshold": 30,
-            "maxwidth": 100
-        }
-    },
-    {
-        "name": "6",
-        "path": "gif/bocchi-the-rock-bocchi-the-rock-gif.gif",
-        "flags": {
-            "color": true,
-            "halfblock": false,
-            "braille": true,
+            "mode": "braille",
             "threshold": 30,
             "maxwidth": 100
         }

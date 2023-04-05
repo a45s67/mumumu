@@ -104,10 +104,7 @@ func flattenAsciiImages(gifFramesSlice []GifFrame, colored bool) []string {
 	return asciiArtSet
 }
 
-func gif2Ascii(gifData *gif.GIF, flagsEx FlagsEx) []GifFrame {
-	halfBlockMode := flagsEx.halfBlock
-	flags := flagsEx.flags
-
+func gif2Ascii(gifData *gif.GIF, flags FlagsEx) []GifFrame {
 	var (
 		err                 error
 		gifFramesSlice      = make([]GifFrame, len(gifData.Image))
@@ -148,7 +145,7 @@ func gif2Ascii(gifData *gif.GIF, flagsEx FlagsEx) []GifFrame {
 
 			frameImage := frame.SubImage(frame.Rect)
 			dimensions = getIdealRenderSize(frameImage.Bounds(), width)
-			if !halfBlockMode {
+			if !flags.halfBlock {
 				dimensions[1] /= 2
 			}
 
@@ -159,7 +156,7 @@ func gif2Ascii(gifData *gif.GIF, flagsEx FlagsEx) []GifFrame {
 			}
 
 			var asciiCharSet [][]imgManip.AsciiChar
-			if halfBlockMode {
+			if flags.halfBlock {
 				asciiCharSet, err = imgManip.ConvertToHalfBlockChars(imgSet, negative, colored, grayscale)
 			} else if flags.Braille {
 				asciiCharSet, err = imgManip.ConvertToBrailleChars(imgSet, negative, colored, grayscale, colorBg, fontColor, threshold)
