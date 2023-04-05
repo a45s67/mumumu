@@ -66,8 +66,8 @@ func readFlags(gifOption Option) FlagsEx {
 
 func initArgv(config *string, target *string) {
 	flag.StringVar(config, "c", "config.json", "Config file path.")
-	flag.StringVar(target, "g", "mumumu", "Render the gif set in config file.")
-    flag.Parse();
+	flag.StringVar(target, "g", "mumumu", "Load the gif setting in config file.")
+	flag.Parse()
 }
 
 func main() {
