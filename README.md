@@ -41,10 +41,9 @@ config.json
         "path": "https://media.tenor.com/nIfKxqBUqQQAAAAC/shake-head-anime.gif", // Support url or file path
         "flags": {
             "color": true, // Color or gray scale
-            "halfblock": false, // Render with ▀
-            "braille": true, // Render with ⣿
+            "mode": "braille" // Support three modes: "halfblock" render with ▀, "braille" render with ⣿, "ascii" render with asciis
             "threshold": 50, // Gray scale threashold 0-255
-            "maxwidth": 100  // Max width (in char length) when rendering in terminal
+            "maxwidth": 100 // Max width (in char length) when rendering in terminal
         },
         "message": "You have mumumued for %d seconds..." // Message below the rendered git in terminal
     },
@@ -56,6 +55,16 @@ config.json
 - Supporting three rendering modes: ascii, braille, halfblock
 - Center align when rendering gif
 - Customizable message for rendering gif
+
+# Login theme
+You can set mumumu as first command in your shell rc file. For example, I set this command in my `.zprofile` file:
+``` zsh
+~/projects/mumumu/mumumu -c ~/projects/mumumu/config.json -g kita-kirakira
+```
+
+Reference
+- [ZSH: .zprofile, .zshrc, .zlogin - What goes where?](https://apple.stackexchange.com/questions/388622/zsh-zprofile-zshrc-zlogin-what-goes-where)
+- [關於 Linux 下 Bash 與 Zsh 啟動檔的載入順序研究](https://blog.miniasp.com/post/2021/07/26/Bash-and-Zsh-Initialization-Files)
 
 # TODO
 - config file 
